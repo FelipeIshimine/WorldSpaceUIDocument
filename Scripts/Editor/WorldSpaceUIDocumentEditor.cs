@@ -64,7 +64,6 @@ namespace WorldSpaceUI.Editor
 			{
 				var serializedSubAsset = new SerializedObject(obj.objectReferenceValue);
 				var referenceResolution = serializedSubAsset.FindProperty("m_ReferenceResolution");
-				Debug.Log(referenceResolution==null);
 				var propField = new PropertyField(referenceResolution);
 				propField.BindProperty(referenceResolution);
 				foldout.contentContainer.Add(propField);
