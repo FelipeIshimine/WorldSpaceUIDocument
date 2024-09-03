@@ -1,0 +1,19 @@
+{
+    "name": "WorldSpaceUI.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0d8cf58071d9410ca1252e864d5cdd33",
+        "GUID:d2af72669f847f44d9b14eec3b6ea962"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
