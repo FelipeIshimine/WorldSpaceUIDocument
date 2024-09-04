@@ -75,31 +75,34 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 		
 	    
-		col = gameObject.GetComponent<BoxCollider>();
-		panelSettings.SetScreenToPanelSpaceFunction(screenPosition =>
+		if(panelSettings)
 		{
-			screenPosition.y = Screen.height - screenPosition.y ;
-		    
-			var invalidPosition = new Vector2(float.NaN, float.NaN);
-
-			var mainCamera = GetCamera();
-			var cameraRay = mainCamera.ScreenPointToRay(screenPosition);
-	        
-			if (!col.Raycast(cameraRay, out hit, 100f))
+            col = gameObject.GetComponent<BoxCollider>();
+			panelSettings.SetScreenToPanelSpaceFunction(screenPosition =>
 			{
-				Debug.DrawRay(cameraRay.origin, cameraRay.direction*100, Color.magenta);
-				return invalidPosition;
-			}
+				screenPosition.y = Screen.height - screenPosition.y;
 
-			Debug.DrawLine(cameraRay.origin, hit.point, Color.green);
-			Vector2 pixelUV = hit.textureCoord;
+				var invalidPosition = new Vector2(float.NaN, float.NaN);
 
-			pixelUV.y = 1 - pixelUV.y;
-			pixelUV.x *= this.document.panelSettings.targetTexture.width;
-			pixelUV.y *= this.document.panelSettings.targetTexture.height;
+				var mainCamera = GetCamera();
+				var cameraRay = mainCamera.ScreenPointToRay(screenPosition);
 
-			return pixelUV;
-		});
+				if (!col.Raycast(cameraRay, out hit, 100f))
+				{
+					Debug.DrawRay(cameraRay.origin, cameraRay.direction * 100, Color.magenta);
+					return invalidPosition;
+				}
+
+				Debug.DrawLine(cameraRay.origin, hit.point, Color.green);
+				Vector2 pixelUV = hit.textureCoord;
+
+				pixelUV.y = 1 - pixelUV.y;
+				pixelUV.x *= this.document.panelSettings.targetTexture.width;
+				pixelUV.y *= this.document.panelSettings.targetTexture.height;
+
+				return pixelUV;
+			});
+		}
 	}
 
 	private void Init()
@@ -125,7 +128,7 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 			renderTexture = new RenderTexture(
 				width:panelSettings.referenceResolution.x,
 				height:panelSettings.referenceResolution.y, 
-				0);
+				32);
 				
 			panelSettings.targetTexture = renderTexture;
 		}
