@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,6 +13,29 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 	[SerializeField] private UIDocument document;
 	[SerializeField] internal PanelSettings panelSettingsAsset;
+	[SerializeField] private WorldSpaceUIDocument parentDocument;
+	[SerializeField] private Vector2 normalizedPosition;
+
+	public Vector2 NormalizedPosition
+	{
+		get => normalizedPosition;
+		set
+		{ 
+            normalizedPosition = value; 
+            ApplyNormalizedPosition();
+        }
+	}
+
+	public Vector2 Pivot
+	{
+		get => pivot;
+		set
+		{
+			pivot = value;
+			Init();
+		}
+	}
+
 	private RaycastHit hit;
 
 	private float targetZ;
@@ -27,7 +51,7 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 	private bool isDirty = false;
 	private Mesh mesh;
-	private BoxCollider col;
+	private MeshCollider col;
 
 	private PanelSettings panelSettings;
 
@@ -68,16 +92,46 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 	{
 		document = GetComponent<UIDocument>();
 	}
+	
+	private Vector2 NormalizedPositionToLocalPosition(Vector2 nPosition)
+	{
+		var offset = Vector2.Scale(pivot, -panelSettings.referenceResolution)/pixelsPerUnit;
+		//var pivotPos = Vector2.Scale(panelSettings.referenceResolution, offset);
+		return offset + Vector2.Scale(panelSettings.referenceResolution,nPosition)/pixelsPerUnit;
+	}
 
 	private void Start()
 	{
 		Init();
 
-		
+	
 	    
-		if(panelSettings)
+	
+	}
+
+	private Vector3 NormalizedPositionToWorldPosition(Vector2 normalizedPosition) =>
+		transform.TransformPoint(NormalizedPositionToLocalPosition(normalizedPosition));
+
+	private void Init()
+	{
+//		Debug.Log("Init");
+		if (!panelSettingsAsset)
 		{
-            col = gameObject.GetComponent<BoxCollider>();
+			Debug.LogWarning("PanelSettingsAsset is Null. InitializationCancelled");
+			return;
+		}
+			
+		if ((!panelSettings || panelSettingsAsset.referenceResolution != panelSettings.referenceResolution))
+		{
+			if (Application.isPlaying && panelSettings)
+			{
+				Destroy(panelSettings);
+			}
+			panelSettings = Instantiate(panelSettingsAsset);
+			panelSettings.name = $"{panelSettings.name} {gameObject.GetInstanceID()}";
+			document.panelSettings = panelSettings;
+			panelSettings.targetTexture = renderTexture;
+			col = gameObject.GetComponent<MeshCollider>();
 			panelSettings.SetScreenToPanelSpaceFunction(screenPosition =>
 			{
 				screenPosition.y = Screen.height - screenPosition.y;
@@ -91,8 +145,9 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 				{
 					Debug.DrawRay(cameraRay.origin, cameraRay.direction * 100, Color.magenta);
 					return invalidPosition;
-				}
+				}	
 
+				//Debug.Log(mainCamera.name);
 				Debug.DrawLine(cameraRay.origin, hit.point, Color.green);
 				Vector2 pixelUV = hit.textureCoord;
 
@@ -102,25 +157,6 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 				return pixelUV;
 			});
-		}
-	}
-
-	private void Init()
-	{
-		Debug.Log("Init");
-		if (!panelSettingsAsset)
-		{
-			Debug.LogWarning("PanelSettingsAsset is Null. InitializationCancelled");
-			return;
-		}
-			
-		if ((!panelSettings || panelSettingsAsset.referenceResolution != panelSettings.referenceResolution))
-		{
-				
-			panelSettings = Instantiate(panelSettingsAsset);
-			panelSettings.name = $"{panelSettings.name} {gameObject.GetInstanceID()}";
-			document.panelSettings = panelSettings;
-			panelSettings.targetTexture = renderTexture;
 		}
 			
 		if (!renderTexture)
@@ -133,7 +169,17 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 			panelSettings.targetTexture = renderTexture;
 		}
 			
+		ApplyNormalizedPosition();
+		
 		CreateMesh((Vector2)panelSettings.referenceResolution / pixelsPerUnit, pivot);
+	}
+
+	private void ApplyNormalizedPosition()
+	{
+		if (parentDocument)
+		{
+			transform.transform.position = parentDocument.NormalizedPositionToWorldPosition(normalizedPosition);
+		}
 	}
 
 	private void CreateMesh(Vector2 size, Vector3 offset)
@@ -204,10 +250,11 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 		if (!col && !gameObject.TryGetComponent(out col))
 		{
-			col = meshRenderer.gameObject.AddComponent<BoxCollider>();
+			col = meshRenderer.gameObject.AddComponent<MeshCollider>();
 		}
+		col.sharedMesh = mesh;/*
 		col.center = (Vector3)size / 2f + offset;
-		col.size = size;
+		col.size = size;*/
 	}
 
 	private Camera GetCamera()
