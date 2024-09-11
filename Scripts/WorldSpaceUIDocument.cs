@@ -90,14 +90,23 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 	void Awake()
 	{
+		if (Application.isPlaying)
+		{
+			name = $"[{gameObject.GetInstanceID()}]{name}";
+		}
 		document = GetComponent<UIDocument>();
 	}
 	
 	private Vector2 NormalizedPositionToLocalPosition(Vector2 nPosition)
 	{
-		var offset = Vector2.Scale(pivot, -panelSettings.referenceResolution)/pixelsPerUnit;
-		//var pivotPos = Vector2.Scale(panelSettings.referenceResolution, offset);
-		return offset + Vector2.Scale(panelSettings.referenceResolution,nPosition)/pixelsPerUnit;
+		if(panelSettings)
+		{
+			var offset = Vector2.Scale(pivot, -panelSettings.referenceResolution) / pixelsPerUnit;
+			//var pivotPos = Vector2.Scale(panelSettings.referenceResolution, offset);
+			return offset + Vector2.Scale(panelSettings.referenceResolution, nPosition) / pixelsPerUnit;
+		}
+		Debug.LogWarning("Panel settings not found");
+		return Vector2.zero;
 	}
 
 	private void Start()
@@ -128,7 +137,7 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 				Destroy(panelSettings);
 			}
 			panelSettings = Instantiate(panelSettingsAsset);
-			panelSettings.name = $"{panelSettings.name} {gameObject.GetInstanceID()}";
+			panelSettings.name =  $"[{gameObject.GetInstanceID()}]{panelSettings.name.Replace($"(Clone)", $"({name})")}";
 			document.panelSettings = panelSettings;
 			panelSettings.targetTexture = renderTexture;
 			col = gameObject.GetComponent<MeshCollider>();
