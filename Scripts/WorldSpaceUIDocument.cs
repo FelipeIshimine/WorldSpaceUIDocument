@@ -12,9 +12,11 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 	private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 
 	[SerializeField] private UIDocument document;
+	public UIDocument Document => document; 
 	[SerializeField] internal PanelSettings panelSettingsAsset;
 	[SerializeField] private WorldSpaceUIDocument parentDocument;
 	[SerializeField] private Vector2 normalizedPosition;
+	[SerializeField] private Vector3 parentPositionOffset;
 
 	public Vector2 NormalizedPosition
 	{
@@ -187,7 +189,7 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 	{
 		if (parentDocument)
 		{
-			transform.transform.position = parentDocument.NormalizedPositionToWorldPosition(normalizedPosition);
+			transform.transform.position = parentDocument.NormalizedPositionToWorldPosition(normalizedPosition) + parentPositionOffset;
 		}
 	}
 
