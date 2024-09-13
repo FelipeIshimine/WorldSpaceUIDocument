@@ -277,16 +277,19 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 		return cam;
 	}
 
-	public Vector2 GetScreenPosition()
+	public Vector3 GetWorldPosition() => hit.point;/*
 	{
-		//RuntimePanelUtils.CameraTransformWorldToPanel(target.panel, worldPosition, camera);
-		
-		
-        
-		var screenPoint = Camera.main.WorldToScreenPoint(hit.point);
+		return Camera.main.WorldToScreenPoint(hit.point);
+		/*
 		screenPoint.y = Screen.height - screenPoint.y;
-		return screenPoint;
-	}
+		
+		//RuntimePanelUtils.ScreenToPanel(screenPoint)
+
+		//var pos = RuntimePanelUtils.CameraTransformWorldToPanel(document.rootVisualElement.panel, hit.point, cam);
+        
+		return pos;
+	#1#
+	}*/
 
 	private void OnDestroy()
 	{
