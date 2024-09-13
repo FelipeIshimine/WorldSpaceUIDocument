@@ -279,8 +279,12 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 	public Vector2 GetScreenPosition()
 	{
+		//RuntimePanelUtils.CameraTransformWorldToPanel(target.panel, worldPosition, camera);
+		
+		
+        
 		var screenPoint = Camera.main.WorldToScreenPoint(hit.point);
-		screenPoint.y = Screen.currentResolution.height - screenPoint.y;
+		screenPoint.y = Screen.height - screenPoint.y;
 		return screenPoint;
 	}
 
