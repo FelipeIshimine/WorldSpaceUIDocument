@@ -312,6 +312,10 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 	public void OnBeforeSerialize()
 	{
 		pixelsPerUnit = Mathf.Max(1, pixelsPerUnit);
+		if (!Application.isPlaying && document)
+		{
+			document.panelSettings = panelSettingsAsset;
+		}
 	}
 
 	public void OnAfterDeserialize()
