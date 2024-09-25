@@ -18,6 +18,7 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 	[SerializeField] private Vector2 normalizedPosition;
 	[SerializeField] private Vector3 parentPositionOffset;
 
+    
 	public Vector2 NormalizedPosition
 	{
 		get => normalizedPosition;
@@ -64,6 +65,8 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 	private static readonly int DstBlend = Shader.PropertyToID("_DstBlend");
 	private static readonly int SrcBlend = Shader.PropertyToID("_SrcBlend");
 	private static readonly int ZWrite = Shader.PropertyToID("_ZWrite");
+	private bool isHovering;
+	public bool IsHovering => isHovering;
 
 	public enum RenderFace
 	{
@@ -154,10 +157,18 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 
 				if (!col.Raycast(cameraRay, out hit, 100f))
 				{
+					if (isHovering)
+					{
+						isHovering = false;
+					}
 					Debug.DrawRay(cameraRay.origin, cameraRay.direction * 100, Color.magenta);
 					return invalidPosition;
-				}	
+				}
 
+				if (!isHovering)
+				{
+					isHovering = true;
+				}
 				//Debug.Log(mainCamera.name);
 				Debug.DrawLine(cameraRay.origin, hit.point, Color.green);
 				Vector2 pixelUV = hit.textureCoord;
@@ -336,6 +347,24 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 			Init();
 			isDirty = false;
 		}
+
+		
+		/*if (isHovering)
+		{
+			if (material.renderQueue != hoverSortingPriority)
+			{
+				material.renderQueue = hoverSortingPriority;
+			}
+			0
+		}
+		else
+		{
+			if (material.renderQueue != defaultSortingPriority)
+			{
+				material.renderQueue = defaultSortingPriority;
+			}
+		}#1#*/
+		
 	}
 
 	public Mesh GetMesh()
