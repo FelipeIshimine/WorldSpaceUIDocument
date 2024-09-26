@@ -16,12 +16,20 @@ public class OffsetOnHover : MonoBehaviour
 	    {
 		    var localPos = transform.localPosition;
 		    localPos.z = Mathf.SmoothDamp(localPos.z, zOffset, ref vel, .1f);
+		    if (float.IsNaN(localPos.z))
+		    {
+			    localPos.z = 0;
+		    }
 		    transform.localPosition = localPos;
 	    }
 	    else
 	    {
 		    var localPos = transform.localPosition;
 		    localPos.z = Mathf.SmoothDamp(localPos.z, 0, ref vel, .1f);
+		    if (float.IsNaN(localPos.z))
+		    {
+			    localPos.z = 0;
+		    }
 		    transform.localPosition = localPos;
 	    }
     }
