@@ -55,6 +55,7 @@ public class WorldSpaceUIDocument : MonoBehaviour, ISerializationCallbackReceive
 	private bool isDirty = false;
 	private Mesh mesh;
 	private MeshCollider col;
+	public MeshCollider Collider => col;
 
 	private PanelSettings panelSettings;
 
